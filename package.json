@@ -1,0 +1,10 @@
+{
+  "name": "avacompli-upload-api",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/client-sts": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0"
+  }
+}
