@@ -142,12 +142,12 @@
     </main>
 
     <footer>
-  <div>© 2025 AVACompli. All rights reserved.</div>
-  <div>
-    <a href="https://avacompli.com/privacy-policy">Privacy</a> ·
-    <a href="https://avacompli.com/terms-and-conditions">Terms</a>
-  </div>
-</footer>
+      <div>© 2025 AVACompli. All rights reserved.</div>
+      <div>
+        <a href="https://avacompli.com/privacy-policy">Privacy</a> ·
+        <a href="https://avacompli.com/terms-and-conditions">Terms</a>
+      </div>
+    </footer>
 
   </div>
 
@@ -178,7 +178,10 @@
 
     const state = { token: null, files: [] };
 
-    function extOf(name){ const i = name.lastIndexOf("."); return i>=0 ? name.slice(i).toLowerCase() : ""; }
+    function extOf(name){
+      const i = name.lastIndexOf(".");
+      return i>=0 ? name.slice(i).toLowerCase() : "";
+    }
     function validFile(f){
       return CONFIG.allowedExt.includes(extOf(f.name)) && f.size <= CONFIG.maxFileMB*1024*1024;
     }
@@ -224,7 +227,8 @@
       fileList.innerHTML = "";
       state.files.forEach(f=>{
         const row = document.createElement("div"); row.className = "file";
-        const left = document.createElement("div"); const right = document.createElement("div"); right.style.minWidth="160px"; right.style.textAlign="right";
+        const left = document.createElement("div");
+        const right = document.createElement("div"); right.style.minWidth="160px"; right.style.textAlign="right";
         const name = document.createElement("div"); name.className="fname"; name.textContent = f.name;
         const meta = document.createElement("div"); meta.className="status"; meta.textContent = (f.type||"application/octet-stream")+" • "+(Math.round(f.size/1024/1024*10)/10)+" MB";
         const bar = document.createElement("progress"); bar.max=1; bar.value=0;
@@ -272,17 +276,16 @@
         const resp = await login(clientId, password);
         state.token = resp.token;
         authMsg.textContent = "";
-        document.getElementById("userBox").classList.remove("hidden");
-        document.getElementById("userBox").textContent = resp.displayName || clientId;
-        document.getElementById("authCard").classList.add("hidden");
-        document.getElementById("uploaderCard").classList.remove("hidden");
+        userBox.classList.remove("hidden");
+        userBox.textContent = resp.displayName || clientId;
+        authCard.classList.add("hidden");
+        uploaderCard.classList.remove("hidden");
       }catch(e){ authMsg.textContent = "Login failed: " + e.message; }
     });
 
-    const picker = document.getElementById("picker");
-    document.getElementById("pickBtn").addEventListener("click", ()=> picker.click());
-    document.getElementById("clearBtn").addEventListener("click", ()=> { state.files=[]; renderFiles(); summary.textContent=""; });
-    document.getElementById("uploadBtn").addEventListener("click", uploadAll);
+    pickBtn.addEventListener("click", ()=> picker.click());
+    clearBtn.addEventListener("click", ()=> { state.files=[]; renderFiles(); summary.textContent=""; });
+    uploadBtn.addEventListener("click", uploadAll);
     picker.addEventListener("change", e=> addFiles(e.target.files));
     drop.addEventListener("click", ()=> picker.click());
     drop.addEventListener("dragover", e=> { e.preventDefault(); drop.classList.add("drag"); });
@@ -291,4 +294,3 @@
   </script>
 </body>
 </html>
-
