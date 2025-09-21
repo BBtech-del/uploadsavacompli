@@ -7,10 +7,12 @@ phases:
     commands:
       - echo "Installing dependencies"
       - npm ci
+
   build:
     commands:
       - echo "Zipping deployment package"
       - zip -r function.zip index.mjs node_modules package.json package-lock.json
+
   post_build:
     commands:
       - echo "Updating Lambda code"
