@@ -1,1 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AVACOMPLI — Upload</title>
+  <link rel="icon" href="https://i.postimg.cc/k4rLfHQQ/Screenshot-2025-09-16-174320.png" />
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --teal: #0FB5A6; /* confirm or provide your exact teal */
+      --white: #ffffff;
+      --black: #0b0f14;
+      --gray-300: #d1d5db;
+      --muted: #9aa4af;
+      --card: #141a21;
+      --bg: #0b0f14;
+      --focus: #22d3ee;
+      --ok: #10b981;
+      --err: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg), #0e141b 40%, #101720 100%);
+      color: var(--white);
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
+    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .logo img { height: 40px; width: auto; display:block; }
+    .wordmark { font-weight: 800; letter-spacing: .3px; font-size: 18px; }
+    .wordmark .ava { color: var(--teal); }
+    .wordmark .compli { color: var(--white); }
+    .card {
+      background: linear-gradient(180deg, var(--card), #0f151c 70%);
+      border: 1px solid #1c2430; border-radius: 12px; padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .hero { display:grid; grid-template-columns: 1fr; gap: 16px; margin-top: 12px; }
+    @media (min-width: 860px){ .hero { grid-template-columns: 1.2fr .8fr; align-items: start; } }
+    .title { font-size: 28px; font-weight: 800; letter-spacing:.2px; }
+    .subtitle { color: var(--muted); margin-top: 6px; }
+    .label { display:block; margin-bottom: 6px; color: var(--gray-300); font-size: 14px; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #243041; background: #0e141b; color: var(--white);
+      outline: none;
+    }
+    input:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(34,211,238,.2); }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      background: var(--teal); color: var(--black); font-weight: 700; padding: 10px 14px; border-radius: 10px; border: none; cursor: pointer;
+    }
+    .btn.secondary { background: transparent; color: var(--white); border: 1px solid #223044; }
+    .drop {
+      border: 2px dashed #284056; border-radius: 12px; padding: 28px; text-align:center; transition: .2s background, .2s border-color;
+      background: #0e141b;
+    }
+    .drop.drag { border-color: var(--focus); background: rgba(34,211,238,.06); }
+    .hints { color: var(--muted); margin-top: 8px; font-size: 14px; }
+    .file-list { margin-top: 16px; display: grid; gap: 10px; }
+    .file { background: #0f151c; border: 1px solid #223044; border-radius: 10px; padding: 12px;
+            display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; }
+    .fname { font-weight: 600; }
+    progress {
+      width: 100%; height: 8px; border-radius: 999px; appearance: none; -webkit-appearance: none; overflow: hidden; background: #213044; border: none;
+    }
+    progress::-webkit-progress-value { background: var(--teal); }
+    .status { font-size: 12px; color: var(--muted); }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+    .pill { display:inline-block; border:1px solid #223044; padding: 6px 10px; border-radius: 999px; color: #c3ced9; font-size: 12px; }
+    footer { margin-top: 28px; color: #c3ced9; font-size: 12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">
+          <img src="https://i.postimg.cc/N0kgd7qR/AVAlog1transp.png" alt="AVACompli logo" />
+        </div>
+        <div class="wordmark">
+          <span class="ava">AVA</span><span class="compli">COMPLI</span>
+        </div>
+      </div>
+      <div id="userBox" class="pill hidden"></div>
+    </header>
+
+    <main class="hero">
+      <section class="card">
+        <div class="title">Upload documents</div>
+        <div class="subtitle">Securely add PDFs and Word documents to your AVACompli workspace.</div>
+
+        <div id="authCard" class="auth">
+          <div class="field">
+            <label class="label" for="clientId">Client ID</label>
+            <input id="clientId" type="text" autocomplete="username" placeholder="e.g., helloatavacompli.com" />
+          </div>
+          <div class="field">
+            <label class="label" for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+          </div>
+          <div class="stack" style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="loginBtn" class="btn">Sign in</button>
+          </div>
+          <div id="authMsg" class="hints" role="status"></div>
+        </div>
+
+        <div id="uploaderCard" class="uploader hidden">
+          <div id="drop" class="drop" tabindex="0" role="button" aria-label="Drop files here">
+            Drag & drop files here
+            <div class="hints">or click to select • PDF, DOCX, DOC • up to <span id="hintMaxSize">1024 MB</span> per file</div>
+          </div>
+          <div class="stack" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <input id="picker" type="file" multiple class="hidden" accept=".pdf,.doc,.docx" />
+            <button class="btn" id="pickBtn">Choose files</button>
+            <button class="btn secondary" id="clearBtn">Clear</button>
+            <button class="btn" id="uploadBtn">Upload</button>
+          </div>
+          <div id="fileList" class="file-list"></div>
+          <div id="summary" class="hints" style="margin-top:10px;"></div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div style="font-weight:700; margin-bottom:8px;">How this works</div>
+        <ul style="margin:0; padding-left:18px; color: #c3ced9;">
+          <li>Files upload securely over HTTPS to Amazon S3.</li>
+          <li>Each upload is limited to your organization’s private folder.</li>
+          <li>Our system processes, OCRs, and indexes content automatically.</li>
+          <li>Original filenames are preserved for audit logs.</li>
+        </ul>
+        <div style="margin-top:14px;">
+          <span class="pill">Automated OCR</span>
+          <span class="pill">PDF + DOCX</span>
+          <span class="pill">Audit-ready</span>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div>© 2025 AVACompli. All rights reserved. AVACompli — Compliance, training, and audits. Automated. Always ready. 312 W 2nd Street #A8380, Casper, WY 82601.</div>
+      <div>
+        <a href="https://avacompli.com/privacy-policy" target="_blank" rel="noopener" style="color:#c3ced9;">Privacy</a> ·
+        <a href="https://avacompli.com/terms-and-conditions" target="_blank" rel="noopener" style="color:#c3ced9;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module">
+    const CONFIG = {
+      apiBase: "https://api.avacompli.com", // set to where you deploy server.js
+      maxFileMB: 1024,                      // 1 GB per file (tunable)
+      allowedExt: [".pdf", ".docx", ".doc"]
+    };
+
+    document.getElementById("hintMaxSize").textContent = CONFIG.maxFileMB + " MB";
+
+    // DOM
+    const clientIdInput = document.getElementById("clientId");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const authMsg = document.getElementById("authMsg");
+    const authCard = document.getElementById("authCard");
+    const uploaderCard = document.getElementById("uploaderCard");
+    const userBox = document.getElementById("userBox");
+    const pickBtn = document.getElementById("pickBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const picker = document.getElementById("picker");
+    const drop = document.getElementById("drop");
+    const fileList = document.getElementById("fileList");
+    const summary = document.getElementById("summary");
+
+    const state = { token: null, files: [] };
+
+    function extOf(name){ const i = name.lastIndexOf("."); return i>=0 ? name.slice(i).toLowerCase() : ""; }
+    function validFile(f){
+      return CONFIG.allowedExt.includes(extOf(f.name)) && f.size <= CONFIG.maxFileMB*1024*1024;
+    }
+    function bearer(){ return state.token ? { Authorization: "Bearer " + state.token } : {}; }
+
+    async function login(clientId, password){
+      const res = await fetch(CONFIG.apiBase + "/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ clientId, password })
+      });
+      if(!res.ok){ throw new Error((await res.text()) || "Login failed"); }
+      return res.json();
+    }
+
+    async function getUploadToken(originalName){
+      const res = await fetch(CONFIG.apiBase + "/api/upload-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...bearer() },
+        credentials: "include",
+        body: JSON.stringify({ originalName })
+      });
+      if(!res.ok){ throw new Error((await res.text()) || "Upload token failed"); }
+      return res.json();
+    }
+
+    async function putPresigned(file, url, onProgress){
+      const total = file.size; let uploaded = 0;
+      const reader = file.stream().getReader(); const chunks = [];
+      while(true){
+        const { value, done } = await reader.read();
+        if(done) break;
+        chunks.push(value); uploaded += value.byteLength;
+        onProgress(uploaded/total);
+      }
+      const blob = new Blob(chunks, { type: file.type || "application/octet-stream" });
+      const resp = await fetch(url, { method: "PUT", body: blob, headers: { "Content-Type": blob.type } });
+      if(!resp.ok) throw new Error("Upload failed ("+resp.status+")");
+    }
+
+    function renderFiles(){
+      fileList.innerHTML = "";
+      state.files.forEach(f=>{
+        const row = document.createElement("div"); row.className = "file";
+        const left = document.createElement("div"); const right = document.createElement("div"); right.style.minWidth="160px"; right.style.textAlign="right";
+        const name = document.createElement("div"); name.className="fname"; name.textContent = f.name;
+        const meta = document.createElement("div"); meta.className="status"; meta.textContent = (f.type||"application/octet-stream")+" • "+(Math.round(f.size/1024/1024*10)/10)+" MB";
+        const bar = document.createElement("progress"); bar.max=1; bar.value=0;
+        const status = document.createElement("div"); status.className="status"; status.textContent="Queued";
+        left.appendChild(name); left.appendChild(meta); left.appendChild(bar);
+        right.appendChild(status); row.appendChild(left); row.appendChild(right);
+        f._ui = { bar, status, row }; fileList.appendChild(row);
+      });
+      summary.textContent = state.files.length ? `${state.files.length} file(s) ready` : "";
+    }
+
+    function addFiles(list){
+      for(const f of list){
+        if(!validFile(f)){ alert(`Rejected: ${f.name}. Allowed: ${CONFIG.allowedExt.join(", ")}; Max: ${CONFIG.maxFileMB} MB`); continue; }
+        state.files.push(f);
+      }
+      renderFiles();
+    }
+
+    async function uploadAll(){
+      let ok=0, fail=0;
+      for(const f of state.files){
+        const ui = f._ui;
+        try{
+          ui.status.textContent = "Preparing…";
+          const token = await getUploadToken(f.name);
+          if(!token.presignedUrl) throw new Error("Server did not return a presignedUrl");
+          ui.status.textContent = "Uploading…";
+          await putPresigned(f, token.presignedUrl, p=> ui.bar.value = p);
+          ui.bar.value = 1; ui.status.textContent = "Uploaded"; ui.status.classList.add("ok"); ok++;
+        }catch(e){
+          ui.status.textContent = "Error: " + e.message; ui.status.classList.add("err"); fail++;
+        }
+      }
+      summary.textContent = `Done • ${ok} success, ${fail} failed`;
+    }
+
+    // Events
+    loginBtn.addEventListener("click", async ()=>{
+      const clientId = clientIdInput.value.trim().toLowerCase();
+      const password = passwordInput.value;
+      if(!clientId || !password){ authMsg.textContent = "Enter your Client ID and password."; return; }
+      authMsg.textContent = "Signing in…";
+      try{
+        const resp = await login(clientId, password);
+        state.token = resp.token;
+        authMsg.textContent = "";
+        document.getElementById("userBox").classList.remove("hidden");
+        document.getElementById("userBox").textContent = resp.displayName || clientId;
+        document.getElementById("authCard").classList.add("hidden");
+        document.getElementById("uploaderCard").classList.remove("hidden");
+      }catch(e){ authMsg.textContent = "Login failed: " + e.message; }
+    });
+
+    const picker = document.getElementById("picker");
+    document.getElementById("pickBtn").addEventListener("click", ()=> picker.click());
+    document.getElementById("clearBtn").addEventListener("click", ()=> { state.files=[]; renderFiles(); summary.textContent=""; });
+    document.getElementById("uploadBtn").addEventListener("click", uploadAll);
+    picker.addEventListener("change", e=> addFiles(e.target.files));
+    drop.addEventListener("click", ()=> picker.click());
+    drop.addEventListener("dragover", e=> { e.preventDefault(); drop.classList.add("drag"); });
+    drop.addEventListener("dragleave", ()=> drop.classList.remove("drag"));
+    drop.addEventListener("drop", e=> { e.preventDefault(); drop.classList.remove("drag"); addFiles(e.dataTransfer.files); });
+  </script>
+</body>
+</html>
 
